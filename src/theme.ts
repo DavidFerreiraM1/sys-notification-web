@@ -5,10 +5,10 @@ import { red } from '@material-ui/core/colors';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#556cd6',
+      main: '#505554',
     },
     secondary: {
-      main: '#19857b',
+      main: '#FF866B',
     },
     error: {
       main: red.A400,
