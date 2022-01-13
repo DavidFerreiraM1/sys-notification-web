@@ -3,9 +3,12 @@ import {
   Box,
   Button,
   Container,
+  FormControl,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   TextField,
+  Checkbox
 } from '@material-ui/core';
 
 import Visibility from '@material-ui/icons/Visibility';
@@ -34,10 +37,16 @@ const statusPasswordInput = {
 export function Login() {
   const classes = loginStyles();
   const [statusPassword, setStatusPassword] = React.useState<'visible' | 'visible-off'>('visible-off');
+  const [autoLogin, setAutoLogin] = React.useState(false);
   const [formLogin, setFormLogin] = React.useState({
     email: '',
     password: ''
   });
+
+  const autoLoginChangeHandler = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setAutoLogin(checked);
+  }, [autoLogin]);
 
   const statusPasswordHandler = React.useCallback(() => {
     statusPassword === 'visible' ? setStatusPassword('visible-off') : setStatusPassword('visible')
@@ -134,6 +143,21 @@ export function Login() {
               >
                 Entrar
               </Button>
+            </Box>
+            <Box className="form-control auto-login">
+              <FormControl>
+                <FormControlLabel
+                  label="Login automático"
+                  labelPlacement="start"
+                  control={
+                    <Checkbox
+                      color="primary"
+                      name="auto-login"
+                      checked={autoLogin}
+                      onChange={autoLoginChangeHandler}
+                    />}
+                />
+              </FormControl>
             </Box>
             <Box className="form-control btn-link">
               <Link

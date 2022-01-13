@@ -22,6 +22,12 @@ export const loginStyles = makeStyles({
       margin: '8px 0',
       width: '320px'
     },
+    '& .auto-login': {
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'flex-end',
+      margin: '22px 0'
+     },
     '& .btn-link': {
      width: '100%',
      display: 'flex',
