@@ -14,5 +14,7 @@ export const formRegister: FormRegisterInterface = {
 
 export const newUserShapeValidations = createShapeValidations({
   email: yup.string().required('Este campo é obrigatório!'),
-  name: yup.string().required('Este campo é obrigatório!')
+  name: yup.string().required('Este campo é obrigatório!'),
+  password: yup.string().required('Este campo é obrigatório!'),
+  confirmPassword: yup.string().required('Este campo é obrigatório!'),
 });

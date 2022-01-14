@@ -24,11 +24,35 @@ import { useFormValidation } from '../../utils/validations/form-validation';
 export function Register() {
   const classes = registerStyles();
   const [formValues, setFormValues] = React.useState(formRegister);
+  const [errorPassword, setErrorPassword] = React.useState('');
 
   const { errors, validateForm } = useFormValidation({
     validations: newUserShapeValidations,
     values: formValues
   });
+
+  const checkPasswords = React.useCallback((value: string) => {
+    if(value !== formValues.password) {
+      setErrorPassword('A senhas não correspondem');
+    } else {
+      setErrorPassword('');
+    }
+  }, [formValues.password, formValues.confirmPassword, errorPassword]);
+
+  const confirmPasswordChangeHandler = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    checkPasswords(value);
+    setFormValues({ ...formValues, confirmPassword: value });   
+  }, [formValues.password, formValues.confirmPassword, errorPassword]);
+
+  React.useEffect(() => {
+    if(errors?.password || errors?.confirmPassword) {
+      setErrorPassword(errors.password);
+    } else {
+      setErrorPassword('');
+      checkPasswords(formValues.confirmPassword);
+    }
+  }, [errors]);
 
   const changeFormValuesHandler = React.useCallback((key: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -167,6 +191,8 @@ export function Register() {
                   label="Senha"
                   value={formValues.password}
                   onChange={changeFormValuesHandler('password')}
+                  error={errors?.password}
+                  helperText={errors?.password}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={6} lg={6}>
@@ -177,7 +203,9 @@ export function Register() {
                   variant="outlined"
                   label="Confirmar a senha"
                   value={formValues.confirmPassword}
-                  onChange={changeFormValuesHandler('confirmPassword')}
+                  onChange={confirmPasswordChangeHandler}
+                  error={errorPassword !== ''}
+                  helperText={errorPassword}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={6} lg={6}>
