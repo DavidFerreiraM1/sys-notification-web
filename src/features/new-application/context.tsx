@@ -7,6 +7,7 @@ const NewAppFormContext = React.createContext({} as NewAppFormValueProvider);
 export function NewAppFormProvider(props: ComponentWithChildrenProps) {
   const [appChannelFormOpenned, setChannelFormOpenned] = React.useState<AppChannelFormOpennedTypes>('');
   const [appForm, setAppForm] = React.useState({
+    id: '',
     name: '',
   });
 
@@ -14,10 +15,8 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps) {
     setChannelFormOpenned(value);
   }, [appChannelFormOpenned]);
 
-  const appFormValueHandler = React.useCallback((key: 'name') => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAppForm({
-      [key]: event.target.value,
-    });
+  const appFormValueHandler = React.useCallback((key: 'name' | 'id') => (value: string) => {
+    setAppForm({ ...appForm, [key]: value });
   }, [appForm]);
 
   return (
