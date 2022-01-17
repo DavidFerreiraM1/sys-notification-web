@@ -13,7 +13,7 @@ export const newAppStyles = makeStyles((theme) => ({
       '& .create-app-btn-area': {
         height: '100%',
         '& .create-app-btn': {
-          height: '100%'
+          height: '56px'
         }
       },
     }
