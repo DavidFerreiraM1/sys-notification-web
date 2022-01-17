@@ -19,6 +19,7 @@ import { useFormValidation } from '../../utils/validations/form-validation';
 import { newAppShapeValidations } from './utils';
 import { AppChannelFormOpennedTypes } from './interfaces';
 import { WebPushForm } from './web-push-form';
+import { SmsForm } from './sms';
 
 function NewAppFormComponent() {
   const classes = newAppStyles();
@@ -168,6 +169,9 @@ function NewAppFormComponent() {
                 </Box>
               </Box>
             </Box>
+            <Collapse in={appChannelFormOpenned === 'sms'}>
+              <SmsForm />
+            </Collapse>
             <Box component="li" className={classes.serviceTypeRoot}>
               <Box
                 component="button"
