@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, TextField } from '@material-ui/core';
+import { Box, Button, Grid, TextField } from '@material-ui/core';
 import { useNewAppFormContext } from '../context';
 
 export function SmsForm() {
@@ -54,6 +54,32 @@ export function SmsForm() {
               // error={errors?.email}
               // helperText={errors?.email && errors.email}
             />
+          </Grid>
+          <Grid item xs={12} sm={12} md={12} lg={12}>
+            <Box
+              width="100%"
+              display="flex"
+              justifyContent="flex-end"
+            >
+              <Box marginRight="4px">
+                <Button
+                  variant="text"
+                  color="primary"
+                  size="large"
+                >
+                  Cancelar
+                </Button>
+              </Box>
+              <Box marginLeft="4px">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                >
+                  Salvar configurações
+                </Button>
+              </Box>
+            </Box>
           </Grid>
         </Grid>
       </Box>
