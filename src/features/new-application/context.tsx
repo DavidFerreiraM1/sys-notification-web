@@ -1,13 +1,15 @@
 import React from 'react';
 import { ComponentWithChildrenProps } from '../../utils/interfaces/with-children-props';
 import { AppChannelFormOpennedTypes, NewAppFormValueProvider } from './interfaces';
-import { newAppForm, newSmsForm, newWebPushForm } from './utils';
+import { newAppForm, newEmailForm, newSmsForm, newWebPushForm } from './utils';
 
 const NewAppFormContext = React.createContext({} as NewAppFormValueProvider);
 
 export function NewAppFormProvider(props: ComponentWithChildrenProps) {
   const [appChannelFormOpenned, setChannelFormOpenned] = React.useState<AppChannelFormOpennedTypes>('');
   const [appForm, setAppForm] = React.useState(newAppForm);
+  
+  const [emailForm, setEmailForm] = React.useState(newEmailForm);
   const [smsForm, setSmsForm] = React.useState(newSmsForm);
   const [webPushForm, setNewWebPushForm, ] = React.useState(newWebPushForm);
 
@@ -18,6 +20,31 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps) {
   const appFormValueHandler = React.useCallback((key: 'name' | 'id') => (value: string) => {
     setAppForm({ ...appForm, [key]: value });
   }, [appForm]);
+
+  const emailFormValueHandler = React.useCallback(
+    (option: 'sever' | 'sender' | 'emailTemplates', key: string) =>
+    (value: string | { name: string; uri: string }) => {
+
+      switch(option) {
+        case 'emailTemplates':
+          const emailTemplateSaves = emailForm.emailTemplates;
+          emailTemplateSaves.push(value as { name: string; uri: string });
+          setEmailForm({
+            ...emailForm,
+            emailTemplates: emailTemplateSaves
+          });
+          break;
+        default:
+          setEmailForm({
+            ...emailForm,
+            [option]: {
+              ...emailForm[option],
+              [key]: value,
+            }
+          });
+          break;
+      } 
+  }, [emailForm]);
 
   const webPushValueHandler = React.useCallback(
     (option: 'site' | 'allowNotification' | 'welcomeNotification', key: string) => (value: string | number) => {
@@ -44,7 +71,9 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps) {
         webPushForm,
         webPushValueHandler,
         smsForm,
-        smsFormValueHandler
+        smsFormValueHandler,
+        emailForm,
+        emailFormValueHandler
       }}
     >
       {props.children}
