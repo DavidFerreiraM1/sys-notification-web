@@ -20,6 +20,7 @@ import { newAppShapeValidations } from './utils';
 import { AppChannelFormOpennedTypes } from './interfaces';
 import { WebPushForm } from './web-push';
 import { SmsForm } from './sms';
+import { EmailForm } from './email';
 
 function NewAppFormComponent() {
   const classes = newAppStyles();
@@ -150,6 +151,9 @@ function NewAppFormComponent() {
                 </Box>
               </Box>
             </Box>
+            <Collapse in={appChannelFormOpenned === 'email'}>
+              <EmailForm />
+            </Collapse>
             <Box component="li" className={classes.serviceTypeRoot}>
               <Box
                 component="button"
