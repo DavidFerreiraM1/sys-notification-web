@@ -1,15 +1,36 @@
 import React from 'react';
 import { Box, Button, Divider, Grid, TextField, Typography } from '@material-ui/core';
-import { NewAppFormProvider } from './context';
+import { NewAppFormProvider, useNewAppFormContext } from './context';
 
 import EmailIcon from '@material-ui/icons/Email';
 import SmsIcon from '@material-ui/icons/Sms';
 import WebIcon from '@material-ui/icons/Web';
 
 import { newAppStyles } from './styles';
+import { useFormValidation } from '../../utils/validations/form-validation';
+import { newAppShapeValidations } from './utils';
 
 function NewAppFormComponent() {
   const classes = newAppStyles();
+  const { appForm, appFormValueHandler } = useNewAppFormContext();
+  const { errors, validateForm } = useFormValidation({
+    validations: newAppShapeValidations,
+    values: {
+      name: appForm.name
+    },
+  });
+
+  const changeValueOnAppForm = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const keyMethod = appFormValueHandler('name');
+    const { value } = event.target;
+
+    keyMethod(value);
+  }, [appForm]);
+
+  const onSubmit = React.useCallback(() => {
+    validateForm();
+    // alert('CRIANDO APP: ' + appForm.name);
+  }, [appForm]);
 
   return (
     <Grid
@@ -42,6 +63,10 @@ function NewAppFormComponent() {
                   shrink: true,
                 }}
                 variant="outlined"
+                value={appForm.name}
+                onChange={changeValueOnAppForm}
+                error={errors?.name}
+                helperText={errors?.name && errors.name}
               />
             </Box>
           </Grid>
@@ -54,6 +79,7 @@ function NewAppFormComponent() {
                 variant="contained"
                 color="primary"
                 size="large"
+                onClick={onSubmit}
                 fullWidth
               >
                 Criar Aplicativo
