@@ -18,7 +18,7 @@ import { newAppStyles } from './styles';
 import { useFormValidation } from '../../utils/validations/form-validation';
 import { newAppShapeValidations } from './utils';
 import { AppChannelFormOpennedTypes } from './interfaces';
-import { WebPushForm } from './web-push-form';
+import { WebPushForm } from './web-push';
 import { SmsForm } from './sms';
 
 function NewAppFormComponent() {
