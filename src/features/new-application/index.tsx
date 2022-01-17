@@ -1,5 +1,13 @@
 import React from 'react';
-import { Box, Button, Divider, Grid, TextField, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  TextField,
+  Typography,
+  Collapse
+} from '@material-ui/core';
 import { NewAppFormProvider, useNewAppFormContext } from './context';
 
 import EmailIcon from '@material-ui/icons/Email';
@@ -9,10 +17,18 @@ import WebIcon from '@material-ui/icons/Web';
 import { newAppStyles } from './styles';
 import { useFormValidation } from '../../utils/validations/form-validation';
 import { newAppShapeValidations } from './utils';
+import { AppChannelFormOpennedTypes } from './interfaces';
+import { WebPushForm } from './web-push-form';
 
 function NewAppFormComponent() {
   const classes = newAppStyles();
-  const { appForm, appFormValueHandler } = useNewAppFormContext();
+  const {
+    appForm,
+    appFormValueHandler,
+    appChannelFormOpenned,
+    appChannelFormOpennedValueHandler
+  } = useNewAppFormContext();
+
   const { errors, validateForm } = useFormValidation({
     validations: newAppShapeValidations,
     values: {
@@ -31,6 +47,13 @@ function NewAppFormComponent() {
     validateForm();
     // alert('CRIANDO APP: ' + appForm.name);
   }, [appForm]);
+
+  const appChannelFormOpennedValueChange = React.useCallback(
+    (appChannelName: AppChannelFormOpennedTypes) =>
+    () => {
+      appChannelFormOpennedValueHandler(appChannelName);
+    },
+  [appChannelFormOpenned]);
 
   return (
     <Grid
@@ -105,10 +128,14 @@ function NewAppFormComponent() {
             Tipos de canais
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={12} md={8} lg={8}>
+        <Grid item xs={12} sm={12} md={12} lg={12}>
           <Box component="ul" className={classes.ulServices}>
             <Box component="li" className={classes.serviceTypeRoot}>
-              <Box component="button" className="content">
+              <Box
+                component="button"
+                className="content"
+                onClick={appChannelFormOpennedValueChange('email')}
+              >
                 <Box className="icon-area">
                   <EmailIcon />
                 </Box>
@@ -123,7 +150,11 @@ function NewAppFormComponent() {
               </Box>
             </Box>
             <Box component="li" className={classes.serviceTypeRoot}>
-              <Box component="button" className="content">
+              <Box
+                component="button"
+                className="content"
+                onClick={appChannelFormOpennedValueChange('sms')}
+              >
                 <Box className="icon-area">
                   <SmsIcon />
                 </Box>
@@ -138,7 +169,11 @@ function NewAppFormComponent() {
               </Box>
             </Box>
             <Box component="li" className={classes.serviceTypeRoot}>
-              <Box component="button" className="content">
+              <Box
+                component="button"
+                className="content"
+                onClick={appChannelFormOpennedValueChange('web-push')}
+              >
                 <Box className="icon-area">
                   <WebIcon />
                 </Box>
@@ -152,6 +187,9 @@ function NewAppFormComponent() {
                 </Box>
               </Box>
             </Box>
+            <Collapse in={appChannelFormOpenned === 'web-push'}>
+              <WebPushForm />
+            </Collapse>
           </Box>
         </Grid>
       </Grid>
