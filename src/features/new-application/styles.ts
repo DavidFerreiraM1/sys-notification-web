@@ -42,7 +42,8 @@ export const newAppStyles = makeStyles((theme) => ({
       alignItems: 'center',
       border: 'none',
       background: 'transparent',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      padding: '0px 8px'
     },
     '& .icon-area': {
       padding: '4px 0px',
