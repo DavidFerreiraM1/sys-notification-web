@@ -1,13 +1,14 @@
 import React from 'react';
 import { ComponentWithChildrenProps } from '../../utils/interfaces/with-children-props';
 import { AppChannelFormOpennedTypes, NewAppFormValueProvider } from './interfaces';
-import { newAppForm, newWebPushForm } from './utils';
+import { newAppForm, newSmsForm, newWebPushForm } from './utils';
 
 const NewAppFormContext = React.createContext({} as NewAppFormValueProvider);
 
 export function NewAppFormProvider(props: ComponentWithChildrenProps) {
   const [appChannelFormOpenned, setChannelFormOpenned] = React.useState<AppChannelFormOpennedTypes>('');
   const [appForm, setAppForm] = React.useState(newAppForm);
+  const [smsForm, setSmsForm] = React.useState(newSmsForm);
   const [webPushForm, setNewWebPushForm, ] = React.useState(newWebPushForm);
 
   const appChannelFormOpennedValueHandler = React.useCallback((value: AppChannelFormOpennedTypes) => {
@@ -29,6 +30,10 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps) {
     });
   }, [webPushForm]);
 
+  const smsFormValueHandler = React.useCallback((key: 'name' | 'login' | 'password') => (value: string) => {
+    setSmsForm({ ...smsForm, [key]: value });
+  }, [smsForm]);
+
   return (
     <NewAppFormContext.Provider
       value={{
@@ -37,7 +42,9 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps) {
         appChannelFormOpennedValueHandler,
         appFormValueHandler,
         webPushForm,
-        webPushValueHandler
+        webPushValueHandler,
+        smsForm,
+        smsFormValueHandler
       }}
     >
       {props.children}
