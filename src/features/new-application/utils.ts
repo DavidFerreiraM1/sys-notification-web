@@ -1,15 +1,29 @@
 import * as yup from 'yup';
 import { createShapeValidations } from '../../utils/validations/form-validation';
-import { NewAppFormType, SmsFormType, WebPushFormType } from './interfaces';
+import { EmailFormType, NewAppFormType, SmsFormType, WebPushFormType } from './interfaces';
 
 export const newAppForm: NewAppFormType = {
   id: '',
   name: '',
-}
+};
 
 export const newAppShapeValidations = createShapeValidations({
   name: yup.string().required('Este campo é obrigatório!'),
 });
+
+export const newEmailForm: EmailFormType = {
+  sever: {
+    smtpName: '',
+    smptPort: '',
+    userLogin: '',
+    userPassword: '',
+  },
+  sender: {
+    name: '',
+    email: '',
+  },
+  emailTemplates: [],
+}
 
 export const newSmsForm: SmsFormType = {
   name: '',
