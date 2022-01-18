@@ -1,13 +1,18 @@
 import React from 'react';
 import { ComponentWithChildrenProps } from '../../utils/interfaces/with-children-props';
-import { AppChannelFormOpennedTypes, NewAppFormValueProvider } from './interfaces';
+import { AppChannelFormOpennedTypes, AppPropsPage, NewAppFormValueProvider } from './interfaces';
 import { newAppForm, newEmailForm, newSmsForm, newWebPushForm } from './utils';
 
 const NewAppFormContext = React.createContext({} as NewAppFormValueProvider);
 
-export function NewAppFormProvider(props: ComponentWithChildrenProps) {
+export function NewAppFormProvider(props: ComponentWithChildrenProps & AppPropsPage) {
   const [appChannelFormOpenned, setChannelFormOpenned] = React.useState<AppChannelFormOpennedTypes>('');
   const [appForm, setAppForm] = React.useState(newAppForm);
+  const [activeChannels, setActiveChannels] = React.useState({
+    webpush: false,
+    email: false,
+    sms: false,
+  })
   
   const [emailForm, setEmailForm] = React.useState(newEmailForm);
   const [smsForm, setSmsForm] = React.useState(newSmsForm);
@@ -61,6 +66,21 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps) {
     setSmsForm({ ...smsForm, [key]: value });
   }, [smsForm]);
 
+  React.useEffect(() => {
+    if(props.app) {
+      setAppForm({
+        id: props.app.id.toString(),
+        name: props.app.name,
+      });
+
+      setActiveChannels({
+        webpush: props.app.activeChannels.webpush,
+        sms: props.app.activeChannels.sms,
+        email: props.app.activeChannels.email
+      });
+    }
+  }, [props]);
+
   return (
     <NewAppFormContext.Provider
       value={{
@@ -73,7 +93,8 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps) {
         smsForm,
         smsFormValueHandler,
         emailForm,
-        emailFormValueHandler
+        emailFormValueHandler,
+        activeChannels,
       }}
     >
       {props.children}
