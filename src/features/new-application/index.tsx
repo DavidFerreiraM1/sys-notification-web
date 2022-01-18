@@ -6,7 +6,8 @@ import {
   Grid,
   TextField,
   Typography,
-  Collapse
+  Collapse,
+  Snackbar
 } from '@material-ui/core';
 import { NewAppFormProvider, useNewAppFormContext } from './context';
 
@@ -17,11 +18,13 @@ import WebIcon from '@material-ui/icons/Web';
 import { newAppStyles } from './styles';
 import { useFormValidation } from '../../utils/validations/form-validation';
 import { newAppShapeValidations } from './utils';
-import { AppChannelFormOpennedTypes } from './interfaces';
+import { AppChannelFormOpennedTypes, AppPropsPage } from './interfaces';
 import { WebPushForm } from './web-push';
 import { SmsForm } from './sms';
 import { EmailForm } from './email';
-import { ContainerPage } from '../../shared';
+import { ContainerPage, useAlerts } from '../../shared';
+import { authHeader, useVibbraneoApi } from '../../http-client/vibbraneo-api';
+import { useRouter } from 'next/router';
 
 function NewAppFormComponent() {
   const classes = newAppStyles();
@@ -29,7 +32,8 @@ function NewAppFormComponent() {
     appForm,
     appFormValueHandler,
     appChannelFormOpenned,
-    appChannelFormOpennedValueHandler
+    appChannelFormOpennedValueHandler,
+    activeChannels
   } = useNewAppFormContext();
 
   const { errors, validateForm } = useFormValidation({
@@ -46,10 +50,9 @@ function NewAppFormComponent() {
     keyMethod(value);
   }, [appForm]);
 
-  const onSubmit = React.useCallback(() => {
-    validateForm();
-    // alert('CRIANDO APP: ' + appForm.name);
-  }, [appForm]);
+  const { post } = useVibbraneoApi();
+  const { push } = useRouter();
+  const { render } = useAlerts();
 
   const appChannelFormOpennedValueChange = React.useCallback(
     (appChannelName: AppChannelFormOpennedTypes) =>
@@ -57,6 +60,33 @@ function NewAppFormComponent() {
       appChannelFormOpennedValueHandler(appChannelName);
     },
   [appChannelFormOpenned]);
+
+  const onSubmit = React.useCallback(() => {
+    const renderFailureAlert = () => {
+      render('Não foi possível criar o aplicativo!', 'error', 2000);
+    };
+
+    validateForm((hasErrors) => {
+      if(!hasErrors) {
+        post(`apps/`, { 'app_name': appForm.name }, authHeader)
+        .then(async (res) => {
+          const data = await res.json();
+          if (res.status === 200) {
+            push({
+              pathname: '/app/[app-id]',
+              query: {'app-id': data['app_id']}
+            });
+          }
+          else {
+            renderFailureAlert();
+          }
+        })
+        .catch(() => {
+          renderFailureAlert();
+        });
+      }
+    });
+  }, [appForm]);
 
   return (
     <ContainerPage>
@@ -74,7 +104,7 @@ function NewAppFormComponent() {
                 component="h2"
                 variant="h6"
               >
-                Novo Aplicativo
+                {appForm.id !== '' ? 'Informações' : 'Novo Aplicativo'}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={12} md={8} lg={8}>
@@ -86,12 +116,10 @@ function NewAppFormComponent() {
                   label="Nome do aplicativo"
                   placeholder="Informe o nome de indentificação do aplicativo"
                   type="text"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
                   variant="outlined"
                   value={appForm.name}
                   onChange={changeValueOnAppForm}
+                  disabled={appForm.id !== ''}
                   error={errors?.name}
                   helperText={errors?.name && errors.name}
                 />
@@ -107,6 +135,7 @@ function NewAppFormComponent() {
                   color="primary"
                   size="large"
                   onClick={onSubmit}
+                  disabled={appForm.id !== ''}
                   fullWidth
                 >
                   Criar Aplicativo
@@ -124,93 +153,99 @@ function NewAppFormComponent() {
             container
             className={classes.formContainer}
         >
-          <Grid item xs={12} sm={12} md={8} lg={8}>
-            <Typography
-              component="h2"
-              variant="h6"
-            >
-              Tipos de canais
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12}>
-            <Box component="ul" className={classes.ulServices}>
-              <Box component="li" className={classes.serviceTypeRoot}>
-                <Box
-                  component="button"
-                  className="content"
-                  onClick={appChannelFormOpennedValueChange('email')}
-                >
-                  <Box className="icon-area">
-                    <EmailIcon />
+          {
+            appForm.id && (
+              <>
+                <Grid item xs={12} sm={12} md={8} lg={8}>
+                  <Typography
+                    component="h2"
+                    variant="h6"
+                    >
+                    Tipos de canais
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                  <Box component="ul" className={classes.ulServices}>
+                    <Box component="li" className={classes.serviceTypeRoot}>
+                      <Box
+                        component={appForm.id ? 'button' : 'div'}
+                        className="content"
+                        onClick={appChannelFormOpennedValueChange('email')}
+                      >
+                        <Box className="icon-area">
+                          <EmailIcon />
+                        </Box>
+                        <Box className="service-type-name">
+                          <Typography component="span">
+                            E-mail -
+                          </Typography>
+                          <Typography component="span" className="status-service">
+                            { activeChannels.email ? 'Clique para envio manual' : 'Clique para configurar' }
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Collapse in={appChannelFormOpenned === 'email'}>
+                      <EmailForm />
+                    </Collapse>
+                    <Box component="li" className={classes.serviceTypeRoot}>
+                      <Box
+                        component="button"
+                        className="content"
+                        onClick={appChannelFormOpennedValueChange('sms')}
+                      >
+                        <Box className="icon-area">
+                          <SmsIcon />
+                        </Box>
+                        <Box className="service-type-name">
+                          <Typography component="span">
+                            SMS -
+                          </Typography>
+                          <Typography component="span" className="status-service">
+                            { activeChannels.sms ? 'Clique para envio manual' : 'Clique para configurar' }
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Collapse in={appChannelFormOpenned === 'sms'}>
+                      <SmsForm />
+                    </Collapse>
+                    <Box component="li" className={classes.serviceTypeRoot}>
+                      <Box
+                        component="button"
+                        className="content"
+                        onClick={appChannelFormOpennedValueChange('web-push')}
+                      >
+                        <Box className="icon-area">
+                          <WebIcon />
+                        </Box>
+                        <Box className="service-type-name">
+                          <Typography component="span">
+                            Web Push -
+                          </Typography>
+                          <Typography component="span" className="status-service">
+                            { activeChannels.webpush ? 'Clique para envio manual' : 'Clique para configurar' }
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Collapse in={appChannelFormOpenned === 'web-push'}>
+                      <WebPushForm />
+                    </Collapse>
                   </Box>
-                  <Box className="service-type-name">
-                    <Typography component="span">
-                      E-mail -
-                    </Typography>
-                    <Typography component="span" className="status-service">
-                      (Configurar)
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-              <Collapse in={appChannelFormOpenned === 'email'}>
-                <EmailForm />
-              </Collapse>
-              <Box component="li" className={classes.serviceTypeRoot}>
-                <Box
-                  component="button"
-                  className="content"
-                  onClick={appChannelFormOpennedValueChange('sms')}
-                >
-                  <Box className="icon-area">
-                    <SmsIcon />
-                  </Box>
-                  <Box className="service-type-name">
-                    <Typography component="span">
-                      SMS -
-                    </Typography>
-                    <Typography component="span" className="status-service">
-                      (Configurar)
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-              <Collapse in={appChannelFormOpenned === 'sms'}>
-                <SmsForm />
-              </Collapse>
-              <Box component="li" className={classes.serviceTypeRoot}>
-                <Box
-                  component="button"
-                  className="content"
-                  onClick={appChannelFormOpennedValueChange('web-push')}
-                >
-                  <Box className="icon-area">
-                    <WebIcon />
-                  </Box>
-                  <Box className="service-type-name">
-                    <Typography component="span">
-                      Web Push -
-                    </Typography>
-                    <Typography component="span" className="status-service">
-                      (Configurar)
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-              <Collapse in={appChannelFormOpenned === 'web-push'}>
-                <WebPushForm />
-              </Collapse>
-            </Box>
-          </Grid>
+                </Grid>
+              </>
+            )
+          }
         </Grid>
       </Grid>
     </ContainerPage>
   );
 }
 
-export function NewApplicationForm() {
+export function NewApplicationForm(props: AppPropsPage) {
   return (
-    <NewAppFormProvider>
+    <NewAppFormProvider {...props}>
       <NewAppFormComponent />
     </NewAppFormProvider>
   )
