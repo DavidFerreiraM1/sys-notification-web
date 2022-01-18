@@ -2,13 +2,19 @@ import React from 'react';
 import { Box, Button, FormControl, FormLabel, Grid, Switch, TextField } from '@material-ui/core';
 
 import { useNewAppFormContext } from '../context';
+import { authHeader, useVibbraneoApi } from '../../../http-client/vibbraneo-api';
+import { useRouter } from 'next/router';
+import { useAlerts } from '../../../shared';
+import { useLocallStorage } from '../../../local-storage';
 
 export function WebPushForm() {
   const {
     webPushForm,
     webPushValueHandler,
     appChannelFormOpenned,
-    appChannelFormOpennedValueHandler
+    appChannelFormOpennedValueHandler,
+    appForm,
+    resetWebPushForm
   } = useNewAppFormContext();
 
   const webPushFormChangeHandler = React.useCallback(
@@ -29,8 +35,58 @@ export function WebPushForm() {
   }, [webPushForm.welcomeNotification.enableUrlRedirect]);
 
   const closeAppFormOpenned = React.useCallback(() => {
+    resetWebPushForm();
     appChannelFormOpennedValueHandler('');
   }, [appChannelFormOpenned]);
+
+  const { post } = useVibbraneoApi();
+  const { replace } = useRouter();
+  const { userLoggedInfo } = useLocallStorage();
+  const { render } = useAlerts();
+  const submitForm = React.useCallback(() => {
+    post(
+      `apps/${appForm.id}/webpushes/settings`,
+      {
+        'settings': {
+          'site': {
+            'name': webPushForm.site.name,
+            'address': webPushForm.site.address,
+            'url_icon': webPushForm.site.urlIcon
+          },
+          'allow_notification': {
+            'message_text': webPushForm.allowNotification.messageText,
+            'allow_button_text': webPushForm.allowNotification.allowButtonText,
+            'deny_button_text': webPushForm.allowNotification.denyButtonText
+          },
+          'welcome_notification': {
+            'message_title': webPushForm.welcomeNotification.messageTitle,
+            'message_text': webPushForm.welcomeNotification.messageText,
+            'enable_url_redirect': webPushForm.welcomeNotification.enableUrlRedirect,
+            'url_redirect': webPushForm.welcomeNotification.urlRedirect
+          }            
+        }
+      },
+      authHeader()
+    )
+    .then( async (res) => {
+      if (res.status === 200) {
+        const userLogged = userLoggedInfo.get();
+        render('Configuração criada com sucesso!', 'success', 3000);
+        replace({
+          pathname: '/app/[app-id]',
+          query: {
+            'app-id': appForm.id,
+            'auth-token': userLogged?.token,
+          }
+        });
+      } else {
+        render('Falha em salvar sua configuração, verifique os campos e tente novamente!', 'error', 4000);
+      }
+    })
+    .catch(() => {
+      render('Não foi possível criar configuração!', 'error', 4000);
+    })
+  }, [webPushForm]);
 
   return (
     <form>
@@ -45,8 +101,8 @@ export function WebPushForm() {
               label="Nome do site"
               value={webPushForm.site.name}
               onChange={webPushFormChangeHandler('site', 'name')}
-              // error={errors?.email}
-              // helperText={errors?.email && errors.email}
+              
+              
             />
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={6}>
@@ -58,8 +114,8 @@ export function WebPushForm() {
               label="Endereço do site"
               value={webPushForm.site.address}
               onChange={webPushFormChangeHandler('site', 'address')}
-              // error={errors?.email}
-              // helperText={errors?.email && errors.email}
+              
+              
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -71,8 +127,8 @@ export function WebPushForm() {
               label="Url do ícone do site"
               value={webPushForm.site.urlIcon}
               onChange={webPushFormChangeHandler('site', 'urlIcon')}
-              // error={errors?.email}
-              // helperText={errors?.email && errors.email}
+              
+              
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -84,8 +140,8 @@ export function WebPushForm() {
               label="Texto da mensagem na notificação"
               value={webPushForm.allowNotification.messageText}
               onChange={webPushFormChangeHandler('allowNotification', 'messageText')}
-              // error={errors?.email}
-              // helperText={errors?.email && errors.email}
+              
+              
             />
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4}>
@@ -97,8 +153,8 @@ export function WebPushForm() {
               label='Texto do botão "Permitir"'
               value={webPushForm.allowNotification.allowButtonText}
               onChange={webPushFormChangeHandler('allowNotification', 'allowButtonText')}
-              // error={errors?.email}
-              // helperText={errors?.email && errors.email}
+              
+              
             />
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4}>
@@ -110,8 +166,8 @@ export function WebPushForm() {
               label='Texto do botão "Negar"'
               value={webPushForm.allowNotification.denyButtonText}
               onChange={webPushFormChangeHandler('allowNotification', 'denyButtonText')}
-              // error={errors?.email}
-              // helperText={errors?.email && errors.email}
+              
+              
             />
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4}>
@@ -123,13 +179,13 @@ export function WebPushForm() {
               label="Título da notificação"
               value={webPushForm.welcomeNotification.messageTitle}
               onChange={webPushFormChangeHandler('welcomeNotification', 'messageTitle')}
-              // error={errors?.email}
-              // helperText={errors?.email && errors.email}
+              
+              
             />
           </Grid>
           <Grid item xs={12} sm={12} md={4} lg={4}>
             <FormControl>
-            <FormLabel component="legend">Habilitar/Desabilitar url para redirecionamento</FormLabel>
+            <FormLabel component="legend">Desabilitar/Habilitar url para redirecionamento</FormLabel>
               <Grid
                 container
                 component="label"
@@ -159,8 +215,8 @@ export function WebPushForm() {
               label="Endereço do link de destino"
               value={webPushForm.welcomeNotification.urlRedirect}
               onChange={webPushFormChangeHandler('welcomeNotification', 'urlRedirect')}
-              // error={errors?.email}
-              // helperText={errors?.email && errors.email}
+              
+              
             />
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -184,6 +240,7 @@ export function WebPushForm() {
                   variant="contained"
                   color="primary"
                   size="large"
+                  onClick={submitForm}
                 >
                   Salvar configurações
                 </Button>
