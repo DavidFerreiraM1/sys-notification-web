@@ -1,7 +1,8 @@
 import { LocalStorageMethodReturn, UserLoggedInfoKey, UserLoggedInfoData } from './interfaces';
 
 function userLoggedInfo(): LocalStorageMethodReturn<UserLoggedInfoKey, UserLoggedInfoData> {
-  const get = (key: UserLoggedInfoKey) => {
+  const get = () => {
+    const key = 'user_logged_info';
     const data = localStorage.getItem(key);
     if (data) {
       return JSON.parse(data) as UserLoggedInfoData;
@@ -19,8 +20,8 @@ function userLoggedInfo(): LocalStorageMethodReturn<UserLoggedInfoKey, UserLogge
   }
 }
 
-export function useLoadlStorage() {
+export function useLocallStorage() {
   return {
-    userLoggedInfo,
+    userLoggedInfo: userLoggedInfo(),
   }
 }

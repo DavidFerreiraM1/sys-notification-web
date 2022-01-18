@@ -1,5 +1,5 @@
 export interface LocalStorageMethodReturn<K, V> {
-  get(key: K): V | null;
+  get(): V | null;
   set(value: V): void;
 }
 
