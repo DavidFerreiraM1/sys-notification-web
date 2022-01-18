@@ -121,7 +121,7 @@ export function Login() {
     };
 
     const userInfo = userLoggedInfo.get();
-    if(userInfo) {
+    if(userInfo && userInfo.autoLogin) {
       const { id } = userInfo;
       get(`users/${id}`, authHeader())
       .then( async (res) => {
