@@ -3,7 +3,7 @@ import * as yup from 'yup';
 export interface ResultCallback {
   errors: any;
   hasErrors: boolean;
-  validateForm(): void;
+  validateForm(callback?: (hasError: boolean) => void): void;
 }
 
 export interface FormValidationConfig {
