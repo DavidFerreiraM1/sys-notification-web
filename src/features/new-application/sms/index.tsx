@@ -56,7 +56,10 @@ export function SmsForm() {
             'app-id': appForm.id,
             'auth-token': userLogged?.token,
           }
-        });
+        },
+        `/app/${appForm.id}`,
+        { shallow: true }
+        );
       } else {
         render('Falha em salvar sua configuração, verifique os campos e tente novamente!', 'error', 4000);
       }
