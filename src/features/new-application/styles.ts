@@ -33,7 +33,7 @@ export const newAppStyles = makeStyles((theme) => ({
     padding: '0 0px'
   },
   serviceTypeRoot: {
-    width: '260px',
+    width: 'auto',
     padding: '0px',
     margin: '8px 0',
     '& .content': {
