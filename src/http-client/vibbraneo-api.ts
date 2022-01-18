@@ -1,12 +1,24 @@
+import { useLocallStorage } from '../local-storage';
+
 const baseUrl = 'http://api.vibbraneo.com/';
 
 const headersDefault = {
   'Content-Type': 'application/json'
 };
 
+const { userLoggedInfo } = useLocallStorage();
+const getToken = () => {
+  const data = userLoggedInfo.get();
+  if(data) {
+    return data.token;
+  } else {
+    return '';
+  }
+};
+
 export const authHeader = {
   'Content-Type': 'application/json; charset=utf-8',
-  'Authorization': 'Bearer jwt_token'
+  'Authorization': `Bearer ${getToken()}`,
 };
 
 const get = (url: string, headers?: HeadersInit): Promise<Response> => {
