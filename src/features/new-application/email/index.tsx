@@ -8,7 +8,12 @@ import {
 import { useNewAppFormContext } from '../context';
 
 export function EmailForm() {
-  const { emailForm, emailFormValueHandler } = useNewAppFormContext();
+  const {
+    emailForm,
+    emailFormValueHandler,
+    appChannelFormOpenned,
+    appChannelFormOpennedValueHandler
+  } = useNewAppFormContext();
   
   const emailFormChangeHandler = React.useCallback(
     (option: 'sever' | 'sender' | 'emailTemplates', key: string) => 
@@ -16,6 +21,10 @@ export function EmailForm() {
       const method = emailFormValueHandler(option, key);
       method(value.toString());
   }, [emailForm]);
+
+  const closeAppFormOpenned = React.useCallback(() => {
+    appChannelFormOpennedValueHandler('');
+  }, [appChannelFormOpenned]);
 
   return (
     <Box padding="8px">
@@ -110,6 +119,7 @@ export function EmailForm() {
                   variant="text"
                   color="primary"
                   size="large"
+                  onClick={closeAppFormOpenned}
                 >
                   Cancelar
                 </Button>

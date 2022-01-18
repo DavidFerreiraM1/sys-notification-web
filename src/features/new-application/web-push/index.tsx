@@ -4,7 +4,12 @@ import { Box, Button, FormControl, FormLabel, Grid, Switch, TextField } from '@m
 import { useNewAppFormContext } from '../context';
 
 export function WebPushForm() {
-  const { webPushForm, webPushValueHandler } = useNewAppFormContext();
+  const {
+    webPushForm,
+    webPushValueHandler,
+    appChannelFormOpenned,
+    appChannelFormOpennedValueHandler
+  } = useNewAppFormContext();
 
   const webPushFormChangeHandler = React.useCallback(
     (option: 'site' | 'allowNotification' | 'welcomeNotification', key: string) =>
@@ -22,6 +27,10 @@ export function WebPushForm() {
       keyMethod(1);
     }
   }, [webPushForm.welcomeNotification.enableUrlRedirect]);
+
+  const closeAppFormOpenned = React.useCallback(() => {
+    appChannelFormOpennedValueHandler('');
+  }, [appChannelFormOpenned]);
 
   return (
     <form>
@@ -165,6 +174,7 @@ export function WebPushForm() {
                   variant="text"
                   color="primary"
                   size="large"
+                  onClick={closeAppFormOpenned}
                 >
                   Cancelar
                 </Button>

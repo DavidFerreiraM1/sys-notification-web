@@ -3,7 +3,12 @@ import { Box, Button, Grid, TextField } from '@material-ui/core';
 import { useNewAppFormContext } from '../context';
 
 export function SmsForm() {
-  const { smsForm, smsFormValueHandler } = useNewAppFormContext();
+  const {
+    smsForm,
+    smsFormValueHandler,
+    appChannelFormOpenned,
+    appChannelFormOpennedValueHandler
+  } = useNewAppFormContext();
 
   const changeValueHandler = React.useCallback(
     (key: 'name' | 'login' | 'password') =>
@@ -11,6 +16,10 @@ export function SmsForm() {
       const keyMethod = smsFormValueHandler(key);
       keyMethod(value);
   }, [smsForm]);
+
+  const closeAppFormOpenned = React.useCallback(() => {
+    appChannelFormOpennedValueHandler('');
+  }, [appChannelFormOpenned]);
 
   return (
     <form>
@@ -66,6 +75,7 @@ export function SmsForm() {
                   variant="text"
                   color="primary"
                   size="large"
+                  onClick={closeAppFormOpenned}
                 >
                   Cancelar
                 </Button>
