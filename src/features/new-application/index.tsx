@@ -25,6 +25,7 @@ import { EmailForm } from './email';
 import { ContainerPage, useAlerts } from '../../shared';
 import { authHeader, useVibbraneoApi } from '../../http-client/vibbraneo-api';
 import { useRouter } from 'next/router';
+import { useLocallStorage } from '../../local-storage';
 
 function NewAppFormComponent() {
   const classes = newAppStyles();
@@ -60,7 +61,8 @@ function NewAppFormComponent() {
       appChannelFormOpennedValueHandler(appChannelName);
     },
   [appChannelFormOpenned]);
-
+  
+  const { userLoggedInfo } = useLocallStorage();
   const onSubmit = React.useCallback(() => {
     const renderFailureAlert = () => {
       render('Não foi possível criar o aplicativo!', 'error', 2000);
@@ -72,9 +74,10 @@ function NewAppFormComponent() {
         .then(async (res) => {
           const data = await res.json();
           if (res.status === 200) {
+            const userLogged = userLoggedInfo.get();
             push({
               pathname: '/app/[app-id]',
-              query: {'app-id': data['app_id']}
+              query: {'app-id': data['app_id'], 'auth-token': userLogged?.token }
             },
             `/app/${data['app_id']}`,
             { shallow: true }
