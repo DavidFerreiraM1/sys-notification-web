@@ -2,6 +2,7 @@
 import '../styles/globals.css'
 import Head from 'next/head'
 import { CssBaseline, MuiThemeProvider } from '@material-ui/core'
+import { SnackbarProvider } from 'notistack'
 
 import theme from '../src/theme';
 
@@ -19,7 +20,9 @@ function MyApp({ Component, pageProps }: any) {
 
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
-        <Component {...pageProps} />
+        <SnackbarProvider maxSnack={5}>
+          <Component {...pageProps} />
+        </SnackbarProvider>
       </MuiThemeProvider>
     </>
   )
