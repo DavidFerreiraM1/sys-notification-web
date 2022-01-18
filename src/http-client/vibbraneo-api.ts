@@ -1,6 +1,6 @@
 import { useLocallStorage } from '../local-storage';
 
-const baseUrl = 'http://api.vibbraneo.com';
+const baseUrl = process.env.NEXT_PUBLIC_VIBBRANEO_URL_API;
 
 const headersDefault = {
   'Content-Type': 'application/json'
