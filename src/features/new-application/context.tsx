@@ -33,7 +33,7 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps & AppPropsP
       switch(option) {
         case 'emailTemplates':
           const emailTemplateSaves = emailForm.emailTemplates;
-          emailTemplateSaves.push(value as { name: string; uri: string });
+          emailTemplateSaves.push(value as { code: number; name: string; uri: string; });
           setEmailForm({
             ...emailForm,
             emailTemplates: emailTemplateSaves
@@ -51,6 +51,21 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps & AppPropsP
       } 
   }, [emailForm]);
 
+  const removeEmailTemplate = React.useCallback((codeParam: number) => {
+    const items = emailForm.emailTemplates;
+    setEmailForm({
+      ...emailForm,
+      emailTemplates: items.filter(({ code }) => code !== codeParam),
+    });
+  }, [emailForm]);
+
+  const resetEmailForm = React.useCallback(() => {
+    setEmailForm({
+      ...newEmailForm,
+      emailTemplates: []
+    });
+  }, [emailForm]);
+
   const webPushValueHandler = React.useCallback(
     (option: 'site' | 'allowNotification' | 'welcomeNotification', key: string) => (value: string | number) => {
     setNewWebPushForm({
@@ -62,8 +77,16 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps & AppPropsP
     });
   }, [webPushForm]);
 
+  const resetWebPushForm = React.useCallback(() => {
+    setNewWebPushForm(newWebPushForm);
+  }, [webPushValueHandler]);
+
   const smsFormValueHandler = React.useCallback((key: 'name' | 'login' | 'password') => (value: string) => {
     setSmsForm({ ...smsForm, [key]: value });
+  }, [smsForm]);
+
+  const resetSmsForm = React.useCallback(() => {
+    setSmsForm(newSmsForm);
   }, [smsForm]);
 
   React.useEffect(() => {
@@ -94,7 +117,11 @@ export function NewAppFormProvider(props: ComponentWithChildrenProps & AppPropsP
         smsFormValueHandler,
         emailForm,
         emailFormValueHandler,
+        removeEmailTemplate,
         activeChannels,
+        resetEmailForm,
+        resetSmsForm,
+        resetWebPushForm
       }}
     >
       {props.children}
