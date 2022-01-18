@@ -20,6 +20,8 @@ import { registerStyles } from './styles';
 import { formRegister, newUserShapeValidations } from './utils';
 import { LoginGoogleBtnRender } from '../login/interfaces';
 import { useFormValidation } from '../../utils/validations/form-validation';
+import { useVibbraneoApi } from '../../http-client/vibbraneo-api';
+import { useAlerts } from '../../shared';
 
 export function Register() {
   const classes = registerStyles();
@@ -62,11 +64,36 @@ export function Register() {
     });
   }, [formValues]);
 
+  const { replace } = useRouter();
+  const { post } = useVibbraneoApi();
+  const { render } = useAlerts();
+
   const submitForm = React.useCallback(() => {
-    validateForm();
+    validateForm((hasErrors) => {
+      if(!hasErrors) {
+        post('users/register', {
+          "email": formValues.email,
+          "name": formValues.name,
+          "company_name": formValues.companyName,
+          "phone_number": formValues.phoneNumber,
+          "company_address": formValues.companyAddress,
+          "password": formValues.confirmPassword
+          }
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            replace('/');
+          } else {
+            render('Não foi possível criar um novo usuário!', 'error', 3000);  
+          }
+        })
+        .catch(() => {
+          render('Não foi possível criar um novo usuário!', 'error', 3000);
+        });
+      }
+    });
   }, [formValues]);
 
-  const { replace } = useRouter();
   const cancelSubmit = React.useCallback(() => {
     replace('/')
   }, [formValues]);
@@ -135,15 +162,6 @@ export function Register() {
                     Novo usuário
                   </Typography>
                 </Box>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12} lg={12}>
-                <GoogleLogin
-                  clientId="538179172481-68445nh8s2h39vhur7j73g94v5roqrcj.apps.googleusercontent.com"
-                  onSuccess={signUpWithGoogleSuccess}
-                  onFailure={signUpWithGoogleFailure}
-                  cookiePolicy="single_host_origin"
-                  render={signUpGoogleBtnRender}
-                />
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={12}>
                 <TextField
