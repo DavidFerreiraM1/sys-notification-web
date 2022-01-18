@@ -69,7 +69,7 @@ export function EmailForm() {
   const { render } = useAlerts();
   const submitForm = React.useCallback(() => {
     post(
-      `apps/${appForm.id}`,
+      `apps/${appForm.id}/emails/settings`,
       {
         'settings': {
           'sever': {
