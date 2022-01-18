@@ -11,6 +11,11 @@ export interface NewAppFormValueProvider {
   smsForm: SmsFormType;
   emailForm: EmailFormType;
   appChannelFormOpenned: AppChannelFormOpennedTypes;
+  activeChannels: {
+    webpush: boolean,
+    email: boolean,
+    sms: boolean,
+  }
   appChannelFormOpennedValueHandler(value: AppChannelFormOpennedTypes): void;
   appFormValueHandler(key: string): (value: string) => void;
   webPushValueHandler(option: 'site' | 'allowNotification' | 'welcomeNotification', key: string): (value: string | number) => void;
@@ -58,5 +63,30 @@ export interface WebPushFormType {
     enableUrlRedirect: number;
     urlRedirect: string;
   };
+};
+
+export interface ResponseDataApi {
+  'app_id': number,
+	'app_name': string,
+	'app_token': string,
+	'active_channels': {
+    'webpush': boolean,
+    'email': boolean,
+    'sms': boolean,
+	}
 }
 
+export interface AppData {
+  id: number,
+	name: string,
+	token: string,
+	activeChannels: {
+    webpush: boolean,
+    email: boolean,
+    sms: boolean,
+	}
+}
+
+export interface AppPropsPage {
+  app: AppData | null;
+}
