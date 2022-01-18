@@ -68,14 +68,17 @@ function NewAppFormComponent() {
 
     validateForm((hasErrors) => {
       if(!hasErrors) {
-        post(`apps/`, { 'app_name': appForm.name }, authHeader)
+        post(`apps/`, { 'app_name': appForm.name }, authHeader())
         .then(async (res) => {
           const data = await res.json();
           if (res.status === 200) {
             push({
               pathname: '/app/[app-id]',
               query: {'app-id': data['app_id']}
-            });
+            },
+            `/app/${data['app_id']}`,
+            { shallow: true }
+            );
           }
           else {
             renderFailureAlert();
