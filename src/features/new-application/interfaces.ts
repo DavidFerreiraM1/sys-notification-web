@@ -20,7 +20,11 @@ export interface NewAppFormValueProvider {
   appFormValueHandler(key: string): (value: string) => void;
   webPushValueHandler(option: 'site' | 'allowNotification' | 'welcomeNotification', key: string): (value: string | number) => void;
   smsFormValueHandler(key: 'name' | 'login' | 'password'): (value: string) => void;
-  emailFormValueHandler(option: 'sever' | 'sender' | 'emailTemplates', key: string): (value: string | { name: string; uri: string }) => void;
+  emailFormValueHandler(option: 'sever' | 'sender' | 'emailTemplates', key: string): (value: string | { name: string; uri: string; code: number }) => void;
+  removeEmailTemplate(codeParam: number): void;
+  resetEmailForm(): void;
+  resetWebPushForm(): void;
+  resetSmsForm(): void;
 };
 
 export interface EmailFormType {
@@ -35,6 +39,7 @@ export interface EmailFormType {
     email: string;
   };
   emailTemplates: Array<{
+    code: number;
     name: string;
     uri: string;
   }>;
