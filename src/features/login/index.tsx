@@ -21,10 +21,11 @@ import Image from 'next/image';
 import GoogleLogin from 'react-google-login';
 
 import { loginStyles } from './styles';
-import { LoginGoogleBtnRender } from './interfaces';
-import { useVibbraneoApi } from '../../http-client/vibbraneo-api';
+import { LoginGoogleBtnRender, ResponseUserLogin } from './interfaces';
+import { authHeader, useVibbraneoApi } from '../../http-client/vibbraneo-api';
 import { useRouter } from 'next/router';
 import { useAlerts } from '../../shared';
+import { useLocallStorage } from '../../local-storage';
 
 const statusPasswordInput = {
   'visible': {
@@ -63,19 +64,19 @@ export function Login() {
     });
   }, [formLogin]);
 
-  const loginGoogleBtnRender = React.useCallback((props: LoginGoogleBtnRender) => {
-    return (
-      <Button
-        fullWidth
-        size="large"
-        variant="outlined"
-        color="secondary"
-        onClick={props.onClick}
-      >
-        Entrar com o gmail
-      </Button>
-    )
-  }, []);
+  // const loginGoogleBtnRender = React.useCallback((props: LoginGoogleBtnRender) => {
+  //   return (
+  //     <Button
+  //       fullWidth
+  //       size="large"
+  //       variant="outlined"
+  //       color="secondary"
+  //       onClick={props.onClick}
+  //     >
+  //       Entrar com o gmail
+  //     </Button>
+  //   )
+  // }, []);
 
   const loginWithGoogleSuccess = React.useCallback((response: any) => {
     console.log(response)
@@ -85,18 +86,26 @@ export function Login() {
     console.log(response)
   }, []);
 
-  const { post } = useVibbraneoApi();
+  const { post, get } = useVibbraneoApi();
   const { replace } = useRouter();
   const { render } = useAlerts();
+  const { userLoggedInfo } = useLocallStorage();
   const submitLogin = React.useCallback(() => {
     const failureRenderAlert = () => {
       render('Não foi possível fazer login', 'error', 3000);
     };
-
     post('login/', formLogin)
-    .then((res) => {
+    .then(async (res) => {
       if (res.status === 200) {
+        const data: ResponseUserLogin = await res.json();
+        userLoggedInfo.set({
+          id: data.user.id.toString(),
+          token: data.token,
+          autoLogin: autoLogin
+        });
+
         replace('/app/register');
+
       } else {
         failureRenderAlert();
       }
@@ -105,6 +114,40 @@ export function Login() {
       failureRenderAlert();
     });
   }, [formLogin]);
+
+  const autoLoginStart = React.useCallback(() => {
+    const failureRenderAlert = () => {
+      render('Não foi possível fazer login', 'error', 3000);
+    };
+
+    const userInfo = userLoggedInfo.get();
+    if(userInfo) {
+      const { id } = userInfo;
+      get(`users/${id}`, authHeader)
+      .then( async (res) => {
+        if(res.status === 200) {
+          const data = await res.json();
+          setFormLogin({
+            email: data.email,
+            password: data.password
+          });
+          submitLogin();
+        }
+      })
+      .catch(() => {
+        failureRenderAlert();
+      });
+    } else {
+      failureRenderAlert();
+    }
+  }, [formLogin]);
+
+  React.useEffect(() => {
+    const data = userLoggedInfo.get();
+    if(data && data.autoLogin) {
+      autoLoginStart();
+    };
+  }, []);
 
   return (
     <Container maxWidth="lg">
