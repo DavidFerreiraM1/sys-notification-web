@@ -22,10 +22,23 @@ import { AppChannelFormOpennedTypes, AppPropsPage } from './interfaces';
 import { WebPushForm } from './web-push';
 import { SmsForm } from './sms';
 import { EmailForm } from './email';
-import { ContainerPage, useAlerts } from '../../shared';
+import { ContainerPage, Upgrading, useAlerts } from '../../shared';
 import { authHeader, useVibbraneoApi } from '../../http-client/vibbraneo-api';
 import { useRouter } from 'next/router';
 import { useLocallStorage } from '../../local-storage';
+
+const WeAreWorkingRender = ({ onClose }: any) => {
+  return (
+    <Box>
+      <Upgrading />
+      <Box width="100%" display="flex" justifyContent="center">
+        <Button onClick={onClose}>
+          Fechar
+        </Button>
+      </Box>
+    </Box>
+  )
+}
 
 function NewAppFormComponent() {
   const classes = newAppStyles();
@@ -192,7 +205,8 @@ function NewAppFormComponent() {
                       </Box>
                     </Box>
                     <Collapse in={appChannelFormOpenned === 'email'}>
-                      <EmailForm />
+                      {!activeChannels.email && (<EmailForm />)}
+                      {activeChannels.email && (<WeAreWorkingRender onClose={appChannelFormOpennedValueChange('')} />)}
                     </Collapse>
                     <Box component="li" className={classes.serviceTypeRoot}>
                       <Box
@@ -214,7 +228,8 @@ function NewAppFormComponent() {
                       </Box>
                     </Box>
                     <Collapse in={appChannelFormOpenned === 'sms'}>
-                      <SmsForm />
+                      {!activeChannels.sms && <SmsForm />}
+                      {activeChannels.sms && (<WeAreWorkingRender onClose={appChannelFormOpennedValueChange('')} />)}
                     </Collapse>
                     <Box component="li" className={classes.serviceTypeRoot}>
                       <Box
@@ -236,7 +251,8 @@ function NewAppFormComponent() {
                       </Box>
                     </Box>
                     <Collapse in={appChannelFormOpenned === 'web-push'}>
-                      <WebPushForm />
+                      {!activeChannels.webpush && <WebPushForm />}
+                      {activeChannels.webpush && (<WeAreWorkingRender onClose={appChannelFormOpennedValueChange('')} />)}
                     </Collapse>
                   </Box>
                 </Grid>
