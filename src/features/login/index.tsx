@@ -22,6 +22,9 @@ import GoogleLogin from 'react-google-login';
 
 import { loginStyles } from './styles';
 import { LoginGoogleBtnRender } from './interfaces';
+import { useVibbraneoApi } from '../../http-client/vibbraneo-api';
+import { useRouter } from 'next/router';
+import { useAlerts } from '../../shared';
 
 const statusPasswordInput = {
   'visible': {
@@ -82,6 +85,27 @@ export function Login() {
     console.log(response)
   }, []);
 
+  const { post } = useVibbraneoApi();
+  const { replace } = useRouter();
+  const { render } = useAlerts();
+  const submitLogin = React.useCallback(() => {
+    const failureRenderAlert = () => {
+      render('Não foi possível fazer login', 'error', 3000);
+    };
+
+    post('login/', formLogin)
+    .then((res) => {
+      if (res.status === 200) {
+        replace('/app/register');
+      } else {
+        failureRenderAlert();
+      }
+    })
+    .catch(() => {
+      failureRenderAlert();
+    });
+  }, [formLogin]);
+
   return (
     <Container maxWidth="lg">
       <form>
@@ -94,15 +118,6 @@ export function Login() {
             />
           </Box>
           <Box className="form-login">
-            <Box className="form-control">
-              <GoogleLogin
-                clientId="538179172481-68445nh8s2h39vhur7j73g94v5roqrcj.apps.googleusercontent.com"
-                onSuccess={loginWithGoogleSuccess}
-                onFailure={loginWithGoogleFailure}
-                cookiePolicy="single_host_origin"
-                render={loginGoogleBtnRender}
-              />
-            </Box>
             <Box className="form-control">
               <TextField
                 fullWidth
@@ -136,6 +151,7 @@ export function Login() {
             </Box>
             <Box className="form-control submit-btn">
               <Button
+                onClick={submitLogin}
                 variant="contained"
                 color="primary"
                 size="large"
