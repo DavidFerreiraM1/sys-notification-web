@@ -123,7 +123,7 @@ export function Login() {
     const userInfo = userLoggedInfo.get();
     if(userInfo) {
       const { id } = userInfo;
-      get(`users/${id}`, authHeader)
+      get(`users/${id}`, authHeader())
       .then( async (res) => {
         if(res.status === 200) {
           const data = await res.json();
