@@ -16,10 +16,10 @@ const getToken = () => {
   }
 };
 
-export const authHeader = {
+export const authHeader = () => ({
   'Content-Type': 'application/json; charset=utf-8',
   'Authorization': `Bearer ${getToken()}`,
-};
+});
 
 const get = (url: string, headers?: HeadersInit): Promise<Response> => {
   const headersObj = headers ? headers : headersDefault;
