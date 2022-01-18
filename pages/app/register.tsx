@@ -1,6 +1,6 @@
 import React from 'react';
 import { NewApplicationForm } from '../../src/features';
 
-export default function Home() {
+export default function Register() {
   return <NewApplicationForm />
 }
