@@ -28,7 +28,7 @@ export function useFormValidation(params: FormValidationConfig): ResultCallback{
       }
     });
     
-    callback(tempResult.size > 0);
+    callback(result.size > 0);
   };
 
   return {
