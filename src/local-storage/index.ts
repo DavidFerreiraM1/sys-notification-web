@@ -1,8 +1,8 @@
 import { LocalStorageMethodReturn, UserLoggedInfoKey, UserLoggedInfoData } from './interfaces';
 
 function userLoggedInfo(): LocalStorageMethodReturn<UserLoggedInfoKey, UserLoggedInfoData> {
+  const key = 'user_logged_info';
   const get = () => {
-    const key = 'user_logged_info';
     const data = localStorage.getItem(key);
     if (data) {
       return JSON.parse(data) as UserLoggedInfoData;
@@ -11,12 +11,17 @@ function userLoggedInfo(): LocalStorageMethodReturn<UserLoggedInfoKey, UserLogge
   };
 
   const set = (value: UserLoggedInfoData) => {
-    localStorage.setItem('user_logged_info', JSON.stringify(value));
+    localStorage.setItem(key, JSON.stringify(value));
   };
+
+  const remove = () => {
+    localStorage.removeItem(key);
+  }
 
   return {
     get,
-    set
+    set,
+    remove
   }
 }
 
