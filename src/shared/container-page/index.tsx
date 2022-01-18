@@ -9,7 +9,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  useTheme,
 } from '@material-ui/core';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -21,9 +20,8 @@ import { ComponentWithChildrenProps } from '../../utils/interfaces/with-children
 
 export function ContainerPage(props: ComponentWithChildrenProps) {
   const classes = containerPageStyles();
-  const theme = useTheme();
 
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = React.useCallback(() => {
     open ? setOpen(false) : setOpen(true);
