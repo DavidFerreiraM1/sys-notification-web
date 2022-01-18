@@ -25,10 +25,10 @@ export function useFormValidation(params: FormValidationConfig): ResultCallback{
           setIsInValid(tempResult.size > 0);
           setResult(tempResult);
         });
-
-        callback(tempResult.size > 0);
       }
     });
+    
+    callback(tempResult.size > 0);
   };
 
   return {
