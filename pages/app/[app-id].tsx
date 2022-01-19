@@ -1,12 +1,12 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { NewApplicationForm } from '../../src/features';
-import { useVibbraneoApi } from '../../src/http-client/vibbraneo-api';
+import { useVibbraneoApi as vibbraneoApi} from '../../src/http-client/vibbraneo-api';
 import { AppPropsPage, ResponseDataApi } from '../../src/features/new-application/interfaces';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
-    const { get } = useVibbraneoApi();
+    const { get } = vibbraneoApi();
     const badResponses = [404, 403, 404];
   
     const appId: any = context.query['app-id'];
